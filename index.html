@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oil Bay</title>
+
+<style>
+body{font-family:Arial,Helvetica,sans-serif;background:#f2f4f7;margin:0;padding:10px;}
+h2{text-align:center;margin-bottom:10px;}
+table{width:100%;border-collapse:collapse;background:#fff;}
+th,td{border:1px solid #ccc;padding:8px;text-align:center;}
+th{background:#e9ecef;}
+input{width:95%;padding:6px;font-size:14px;}
+button{padding:8px 10px;font-size:14px;border:none;border-radius:4px;cursor:pointer;}
+.whatsapp{background:#25D366;color:white;}
+.whatsapp:disabled{background:#a5d6b0;cursor:not-allowed;}
+.clear{background:#dc3545;color:white;}
+</style>
+</head>
+
+<body>
+
+<h2>Oil Change Bay</h2>
+
+<table>
+<thead>
+<tr>
+<th>Plate No</th>
+<th>Mobile</th>
+<th>WhatsApp</th>
+<th>Clear</th>
+</tr>
+</thead>
+
+<tbody id="tableBody"></tbody>
+</table>
+
+<script>
+const COUNTRY_CODE="965";
+const MESSAGE="Your oil change is completed. Please proceed to the bay.";
+const tbody=document.getElementById("tableBody");
+
+for(let i=0;i<10;i++){
+  const row=document.createElement("tr");
+  row.innerHTML=`
+    <td><input type="text" placeholder="Plate"></td>
+    <td><input type="tel" placeholder="8-digit number"></td>
+    <td><button class="whatsapp" disabled>WHATSAPP</button></td>
+    <td><button class="clear">CLEAR</button></td>
+  `;
+  tbody.appendChild(row);
+}
+
+tbody.addEventListener("input",function(e){
+  if(e.target.type==="tel"){
+    const row=e.target.closest("tr");
+    const phone=e.target.value.replace(/\D/g,"");
+    const btn=row.querySelector(".whatsapp");
+    btn.disabled = phone.length !== 8;
+  }
+});
+
+tbody.addEventListener("click",function(e){
+  const btn=e.target;
+  const row=btn.closest("tr");
+
+  if(btn.classList.contains("whatsapp")){
+    let phone=row.children[1].children[0].value.replace(/\D/g,"");
+    if(phone.length!==8) return;
+    const full=COUNTRY_CODE+phone;
+    const text=encodeURIComponent(MESSAGE);
+    window.open(`https://wa.me/${full}?text=${text}`,"_blank");
+  }
+
+  if(btn.classList.contains("clear")){
+    row.querySelectorAll("input").forEach(i=>i.value="");
+    row.querySelector(".whatsapp").disabled=true;
+  }
+});
+</script>
+
+</body>
+</html>
