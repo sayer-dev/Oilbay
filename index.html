@@ -1,88 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Oil Bay</title>
+    <meta charset="UTF-8">
+    <title>OilBay Service Notification</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body{font-family:Arial,Helvetica,sans-serif;background:#f2f4f7;margin:0;padding:10px;}
-h2{text-align:center;margin-bottom:10px;}
-table{width:100%;border-collapse:collapse;background:#fff;}
-th,td{border:1px solid #ccc;padding:8px;text-align:center;}
-th{background:#e9ecef;}
-input{width:95%;padding:6px;font-size:14px;}
-button{padding:8px 10px;font-size:14px;border:none;border-radius:4px;cursor:pointer;}
-.whatsapp{background:#25D366;color:white;}
-.whatsapp:disabled{background:#a5d6b0;cursor:not-allowed;}
-.clear{background:#dc3545;color:white;}
-</style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #1e3a8a;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .whatsapp-btn {
+            background-color: #25D366;
+            color: white;
+        }
+
+        .whatsapp-btn:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .note {
+            margin-top: 10px;
+            font-size: 13px;
+            color: red;
+        }
+    </style>
 </head>
-
 <body>
 
-<h2>Oil Change Bay</h2>
+<div class="container">
+    <h1>OilBay</h1>
+    <p>Enter Customer Phone Number:</p>
 
-<table>
-<thead>
-<tr>
-<th>Plate No</th>
-<th>Mobile</th>
-<th>WhatsApp</th>
-<th>Clear</th>
-</tr>
-</thead>
+    <input type="text" id="phone" placeholder="Enter 8-digit number" maxlength="8" oninput="validateNumber()">
 
-<tbody id="tableBody"></tbody>
-</table>
+    <button id="whatsappBtn" class="whatsapp-btn" onclick="sendWhatsApp()" disabled>
+        Send WhatsApp Message
+    </button>
+
+    <div class="note" id="errorMsg"></div>
+</div>
 
 <script>
-const COUNTRY_CODE="965";
-const MESSAGE="Your car oil and filter service is finished. Please proceed to collect your vehicle.
+function validateNumber() {
+    const phone = document.getElementById("phone").value;
+    const button = document.getElementById("whatsappBtn");
+    const errorMsg = document.getElementById("errorMsg");
 
-  تم الانتهاء من خدمة تغيير زيت المحرك وفلتر الزيت لسيارتكم، يرجى التوجه لاستلام المركبة.
-";
-const tbody=document.getElementById("tableBody");
+    // Allow only numbers
+    if (!/^\d*$/.test(phone)) {
+        errorMsg.textContent = "Only numbers are allowed.";
+        button.disabled = true;
+        return;
+    }
 
-for(let i=0;i<10;i++){
-  const row=document.createElement("tr");
-  row.innerHTML=`
-    <td><input type="text" placeholder="Plate"></td>
-    <td><input type="tel" placeholder="8-digit number"></td>
-    <td><button class="whatsapp" disabled>WHATSAPP</button></td>
-    <td><button class="clear">CLEAR</button></td>
-  `;
-  tbody.appendChild(row);
+    // Check if exactly 8 digits
+    if (phone.length === 8) {
+        errorMsg.textContent = "";
+        button.disabled = false;
+    } else {
+        errorMsg.textContent = "Phone number must be exactly 8 digits.";
+        button.disabled = true;
+    }
 }
 
-tbody.addEventListener("input",function(e){
-  if(e.target.type==="tel"){
-    const row=e.target.closest("tr");
-    const phone=e.target.value.replace(/\D/g,"");
-    const btn=row.querySelector(".whatsapp");
-    btn.disabled = phone.length !== 8;
-  }
-});
+function sendWhatsApp() {
+    const phone = document.getElementById("phone").value;
 
-tbody.addEventListener("click",function(e){
-  const btn=e.target;
-  const row=btn.closest("tr");
+    const message = `تم الانتهاء من خدمة تغيير زيت المحرك وفلتر الزيت لسيارتكم، يرجى التوجه لاستلام المركبة.
+Your car oil and filter service is finished. Please proceed to collect your vehicle.`;
 
-  if(btn.classList.contains("whatsapp")){
-    let phone=row.children[1].children[0].value.replace(/\D/g,"");
-    if(phone.length!==8) return;
-    const full=COUNTRY_CODE+phone;
-    const text=encodeURIComponent(MESSAGE);
-    window.open(`https://wa.me/${full}?text=${text}`,"_blank");
-  }
+    const encodedMessage = encodeURIComponent(message);
 
-  if(btn.classList.contains("clear")){
-    row.querySelectorAll("input").forEach(i=>i.value="");
-    row.querySelector(".whatsapp").disabled=true;
-  }
-});
+    // Kuwait country code +965
+    const whatsappURL = `https://wa.me/965${phone}?text=${encodedMessage}`;
+
+    window.open(whatsappURL, "_blank");
+}
 </script>
 
 </body>
 </html>
-
